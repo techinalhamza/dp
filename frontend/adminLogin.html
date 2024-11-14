@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login</title>
+    <style>
+      .login-container {
+        max-width: 400px;
+        margin: 100px auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+      label,
+      input,
+      button {
+        display: block;
+        width: 100%;
+        margin-bottom: 15px;
+      }
+      button {
+        background-color: #007bff;
+        color: white;
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <h1>Admin Login</h1>
+      <form id="adminLoginForm">
+        <label>Username</label>
+        <input type="text" id="username" required />
+        <label>Password</label>
+        <input type="password" id="password" required />
+        <button type="submit">Login</button>
+      </form>
+    </div>
+
+    <script>
+      document
+        .getElementById("adminLoginForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+          const formData = {
+            username: document.getElementById("username").value,
+            password: document.getElementById("password").value,
+          };
+          const response = await fetch("http://localhost:3000/admin/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData),
+          });
+          const result = await response.json();
+          if (result.success) {
+            localStorage.setItem("adminToken", result.token);
+            window.location.href = "adminDashboard.html";
+          } else {
+            alert(result.message);
+          }
+        });
+    </script>
+  </body>
+</html>

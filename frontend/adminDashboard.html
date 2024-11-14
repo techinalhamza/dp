@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        height: 100vh;
+      }
+      .sidebar {
+        width: 250px;
+        background-color: #333;
+        color: #fff;
+        padding: 20px;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+      }
+      .sidebar h2 {
+        text-align: center;
+      }
+      .sidebar ul {
+        list-style-type: none;
+        padding: 0;
+      }
+      .sidebar ul li {
+        padding: 15px;
+        cursor: pointer;
+        color: #ddd;
+      }
+      .sidebar ul li.active,
+      .sidebar ul li:hover {
+        background-color: #555;
+        color: #fff;
+      }
+      .content {
+        margin-left: 270px;
+        padding: 20px;
+        width: calc(100% - 270px);
+      }
+      .card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        background-color: #f9f9f9;
+      }
+      .card h3 {
+        margin: 0;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+      table th,
+      table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+      button {
+        background-color: #007bff;
+        color: white;
+        padding: 10px;
+        cursor: pointer;
+        border: none;
+        border-radius: 5px;
+        margin: 5px;
+      }
+      .reject {
+        background-color: #dc3545;
+      }
+      .preloader {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+      }
+
+      #payments,
+      #sales,
+      #templates,
+      #designers {
+        display: none;
+      }
+      #templatesTable img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 4px;
+      }
+      #templateDetailsModal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+      }
+      #templateDetailsModal > div {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        max-width: 600px;
+        width: 80%;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>Admin Dashboard</h2>
+      <ul>
+        <li class="sidebar-item" data-section="overview">Dashboard Overview</li>
+        <li class="sidebar-item" data-section="designers">Designers</li>
+        <li class="sidebar-item" data-section="templates">Templates</li>
+        <li class="sidebar-item" data-section="sales">Sales Reports</li>
+        <li class="sidebar-item" data-section="payments">Payments</li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+      <!-- Overview Section -->
+      <div id="overview" class="section">
+        <h2>Dashboard Overview</h2>
+        <div class="card" id="totalDesignersCard"></div>
+        <div class="card" id="totalTemplatesCard"></div>
+        <div class="card" id="totalSalesCard"></div>
+        <div class="card" id="totalRevenueCard"></div>
+      </div>
+
+      <!-- Designers Section -->
+      <div id="designers" class="section">
+        <h2>All Designers</h2>
+        <table id="designersTable">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- Designer Details Modal -->
+      <div id="designerDetailsModal" style="display: none">
+        <div style="background: white; padding: 20px; border-radius: 8px">
+          <h2>Designer Details</h2>
+          <p><strong>Name:</strong> <span id="designerName"></span></p>
+          <p><strong>Email:</strong> <span id="designerEmail"></span></p>
+          <p><strong>Phone:</strong> <span id="designerPhone"></span></p>
+          <p>
+            <strong>Total Uploaded Templates:</strong>
+            <span id="designerTemplates"></span>
+          </p>
+          <p>
+            <strong>Payment Method:</strong>
+            <span id="designerPaymentMethod"></span>
+          </p>
+          <p>
+            <strong>Payment Details:</strong>
+            <span id="designerPaymentDetails"></span>
+          </p>
+          <button onclick="closeModal()">Close</button>
+        </div>
+      </div>
+
+      <!-- Templates Section -->
+      <!-- Templates Section -->
+      <div id="templates" class="section">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <h2>All Templates</h2>
+          <!-- Filter Dropdown -->
+          <select id="templateFilter" onchange="filterTemplates()">
+            <option value="all">All Templates</option>
+            <option value="approved">Approved</option>
+            <option value="pending">Pending</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+        <table id="templatesTable">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Designer</th>
+              <th>Description</th>
+              <th>Status</th>
+              <th>Sales Count</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- Template Details Modal -->
+      <div id="templateModal" style="display: none">
+        <div class="modal-content">
+          <button id="closeModal" onclick="closeTemplateModal()">Close</button>
+          <h3 id="modalDescription"></h3>
+          <p>Status: <span id="modalStatus"></span></p>
+          <p>Sales Count: <span id="modalSalesCount"></span></p>
+          <p>
+            <label for="upcInput">Assign UPC Code:</label>
+            <input
+              type="text"
+              id="upcInput"
+              placeholder="Enter UPC code here"
+            />
+          </p>
+          <img
+            id="largeImage"
+            src=""
+            style="width: 10%; height: auto"
+            alt="Large Image"
+          />
+          <div
+            id="imageThumbnails"
+            style="display: flex; gap: 10px; margin-top: 20px; width: 10%"
+          ></div>
+
+          <!-- Approve/Reject Buttons -->
+          <div style="margin-top: 20px">
+            <button id="approveButton">Approve</button>
+            <button id="rejectButton" class="reject">Reject</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sales Reports Section -->
+      <div id="sales" class="section">
+        <h2>Sales Reports</h2>
+        <div id="salesChart"></div>
+        <div id="salesChartContainer">
+          <canvas id="adminSalesChartCanvas" width="400" height="200"></canvas>
+        </div>
+      </div>
+
+      <!-- Payments Section -->
+      <div id="payments" class="section">
+        <h2>Payments</h2>
+        <table id="paymentsTable">
+          <thead>
+            <tr>
+              <th>Designer</th>
+              <th>Payment Method</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Preloader -->
+    <div class="preloader" id="preloader">Loading...</div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+
+    <script>
+      const token = localStorage.getItem("adminToken");
+      if (!token) {
+        alert("No token found. Please log in.");
+        window.location.href = "adminLogin.html";
+      }
+
+      const sections = document.querySelectorAll(".section");
+      const sidebarItems = document.querySelectorAll(".sidebar-item");
+
+      // Variables to store fetched data
+      let designersData = [];
+      let templatesData = [];
+      let salesData = [];
+      let paymentsData = [];
+
+      // Sidebar Navigation
+      sidebarItems.forEach((item) => {
+        item.addEventListener("click", () => {
+          sidebarItems.forEach((i) => i.classList.remove("active"));
+          item.classList.add("active");
+
+          const sectionId = item.getAttribute("data-section");
+          sections.forEach((section) => {
+            section.style.display = section.id === sectionId ? "block" : "none";
+            closeModal();
+            closeTemplateModal();
+          });
+
+          // Load data based on the selected section
+          if (sectionId === "overview") loadDashboardOverview();
+          if (sectionId === "designers") loadDesigners();
+          if (sectionId === "templates") loadTemplates();
+          if (sectionId === "sales") loadSalesReports();
+          if (sectionId === "payments") loadPayments();
+        });
+      });
+
+      async function fetchData(url) {
+        try {
+          const response = await fetch(url, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!response.ok) {
+            console.error("Error:", await response.text());
+            if (response.status === 401 || response.status === 403) {
+              alert("Unauthorized access. Please log in again.");
+              window.location.href = "adminLogin.html";
+            }
+            return null;
+          }
+
+          return response.json();
+        } catch (error) {
+          console.error("Fetch error:", error);
+        }
+      }
+
+      async function loadDashboardOverview() {
+        const overviewData = await fetchData(
+          "http://localhost:3000/admin/overview"
+        );
+        // console.log(overviewData);
+        if (overviewData) {
+          document.getElementById(
+            "totalDesignersCard"
+          ).textContent = `Total Designers: ${overviewData.totalDesigners}`;
+          document.getElementById(
+            "totalTemplatesCard"
+          ).textContent = `Total Templates: ${overviewData.totalTemplates}`;
+          document.getElementById(
+            "totalSalesCard"
+          ).textContent = `Total Sales: ${overviewData.totalSales}`;
+          document.getElementById(
+            "totalRevenueCard"
+          ).textContent = `Total Revenue: $${overviewData.totalRevenue}`;
+        }
+      }
+
+      async function loadDesigners() {
+        designersData = await fetchData(
+          "http://localhost:3000/admin/designers"
+        );
+        const designersTableBody = document
+          .getElementById("designersTable")
+          .querySelector("tbody");
+        designersTableBody.innerHTML = "";
+
+        designersData.forEach((designer) => {
+          // console.log(designer);
+          const row = document.createElement("tr");
+          row.innerHTML = `
+              <td>${designer.name}</td>
+              <td>${designer.email}</td>
+              <td>${designer.phone}</td>
+              <td>${designer.totalTemplates}</td>
+              <td><button onclick="viewDesignerDetails('${designer._id}')">View Details</button></td>
+            `;
+          designersTableBody.appendChild(row);
+        });
+      }
+
+      // Load templates data from the server
+      async function loadTemplates() {
+        templatesData = await fetchData(
+          "http://localhost:3000/admin/templates"
+        );
+        // console.log(templatesData);
+        if (templatesData) {
+          displayTemplates(templatesData);
+        }
+      }
+
+      // Display templates in the table
+      function displayTemplates(templates) {
+        const templatesTableBody = document
+          .getElementById("templatesTable")
+          .querySelector("tbody");
+        templatesTableBody.innerHTML = "";
+
+        templates.forEach((template) => {
+          const firstImage =
+            template.images?.[0] || "https://via.placeholder.com/100";
+
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td><img src="${firstImage}" alt="Template Image" style="width: 80px; height: 80px; object-fit: cover;"></td>
+            <td>${template.designerId?.name || "N/A"}</td>
+            <td>${template.description}</td>
+            <td>${template.status}</td>
+            <td>${template.sales_count || 0}</td>
+            <td>
+              <button onclick="viewTemplateDetails('${
+                template._id
+              }')">View Details</button>
+            </td>
+          `;
+          templatesTableBody.appendChild(row);
+        });
+      }
+
+      // Function to filter templates based on status
+      function filterTemplates() {
+        const filterValue = document.getElementById("templateFilter").value;
+        let filteredTemplates = templatesData;
+
+        // Filter templates based on selected status
+        if (filterValue !== "all") {
+          filteredTemplates = templatesData.filter(
+            (template) =>
+              template.status.toLowerCase() === filterValue.toLowerCase()
+          );
+        }
+
+        // Display filtered templates
+        displayTemplates(filteredTemplates);
+      }
+
+      let selectedTemplateId = null;
+
+      // Function to open the template details modal
+      async function viewTemplateDetails(templateId) {
+        const template = templatesData.find((t) => t._id === templateId);
+        if (!template) return;
+
+        selectedTemplateId = templateId; // Store the current template ID
+        const modal = document.getElementById("templateModal");
+        document.getElementById("modalDescription").textContent =
+          template.description;
+        document.getElementById("modalStatus").textContent = template.status;
+        document.getElementById("modalSalesCount").textContent =
+          template.sales_count || 0;
+
+        // Display all images in the modal
+        const thumbnails = document.getElementById("imageThumbnails");
+        thumbnails.innerHTML = "";
+        template.images.forEach((src) => {
+          const thumb = document.createElement("img");
+          thumb.src = src;
+          thumb.onclick = () =>
+            (document.getElementById("largeImage").src = src);
+          thumbnails.appendChild(thumb);
+        });
+
+        document.getElementById("largeImage").src = template.images[0] || "";
+
+        modal.style.display = "flex";
+      }
+      // Close the modal
+
+      function closeTemplateModal() {
+        document.getElementById("templateModal").style.display = "none";
+      }
+      // document.getElementById("closeModal").addEventListener("click", () => {});
+
+      async function approveTemplate() {
+        const upcCode = document.getElementById("upcInput").value;
+
+        if (!selectedTemplateId) {
+          alert("No template selected");
+          return;
+        }
+        if (!upcCode) {
+          alert("Please enter a UPC code before approving.");
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            `http://localhost:3000/admin/approve-template/${selectedTemplateId}`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ upc: upcCode }),
+            }
+          );
+
+          if (response.ok) {
+            alert("Template approved and UPC assigned successfully");
+            closeModal();
+            closeTemplateModal();
+            loadTemplates(); // Refresh templates list
+          } else {
+            alert("Failed to approve template");
+          }
+        } catch (error) {
+          console.error("Error approving template:", error);
+        }
+      }
+      // Function to reject a template
+      async function rejectTemplate() {
+        if (!selectedTemplateId) return;
+        const response = await fetch(
+          `http://localhost:3000/admin/reject-template/${selectedTemplateId}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          alert("Template rejected successfully");
+          closeModal();
+          closeTemplateModal();
+          loadTemplates(); // Refresh templates list
+        } else {
+          alert("Failed to reject template");
+        }
+      }
+
+      // Add event listeners to buttons
+      document
+        .getElementById("approveButton")
+        .addEventListener("click", approveTemplate);
+      document
+        .getElementById("rejectButton")
+        .addEventListener("click", rejectTemplate);
+
+      // Load templates data on page load
+      loadTemplates();
+
+      // async function loadPayments() {
+      //   paymentsData = await fetchData("http://localhost:3000/admin/payments");
+      //   const paymentsTableBody = document
+      //     .getElementById("paymentsTable")
+      //     .querySelector("tbody");
+      //   paymentsTableBody.innerHTML = "";
+
+      //   paymentsData.forEach((payment) => {
+      //     const row = document.createElement("tr");
+      //     row.innerHTML = `
+      //         <td>${payment.designerName}</td>
+      //         <td>${payment.payment_method}</td>
+      //         <td>${payment.payment_details}</td>
+      //       `;
+      //     paymentsTableBody.appendChild(row);
+      //   });
+      // }
+
+      function viewDesignerDetails(designerId) {
+        const designer = designersData.find((d) => d._id === designerId);
+        console.log(designer);
+        // Extract payment details based on the selected method
+        let paymentInfo = "";
+        if (designer.payment_method === "paypal") {
+          paymentInfo = `PayPal Email: ${
+            designer.payment_details?.paypal_email || "N/A"
+          }`;
+        } else if (designer.payment_method === "venmo") {
+          paymentInfo = `Venmo Username: ${
+            designer.payment_details?.venmo_username || "N/A"
+          }`;
+        } else if (designer.payment_method === "cashapp") {
+          paymentInfo = `CashApp Username: ${
+            designer.payment_details?.cashapp_username || "N/A"
+          }`;
+        } else {
+          paymentInfo = "No payment details available";
+        }
+
+        if (designer) {
+          // Update the modal content
+          document.getElementById("designerName").textContent = designer.name;
+          document.getElementById("designerEmail").textContent = designer.email;
+          document.getElementById("designerPhone").textContent =
+            designer.phone || "N/A";
+          document.getElementById("designerTemplates").textContent =
+            designer.totalTemplates || 0;
+          document.getElementById(
+            "designerPaymentMethod"
+          ).textContent = `Payment Method: ${designer.payment_method}`;
+          document.getElementById("designerPaymentDetails").textContent =
+            paymentInfo;
+
+          document.getElementById("designerDetailsModal").style.display =
+            "block";
+        }
+      }
+
+      function closeModal() {
+        document.getElementById("designerDetailsModal").style.display = "none";
+      }
+      async function loadSalesReports() {
+        const salesData = await fetchData("http://localhost:3000/admin/sales");
+        console.log(salesData);
+        const salesChart = document.getElementById("salesChart");
+        salesData.map((val) => {
+          salesChart.textContent = `Total Sales: ${val.totalSales}, Total Revenue: $${val.totalRevenue}`;
+        });
+        if (salesData) {
+          // salesChart.textContent = `Total Sales: ${salesData.totalSales}, Total Revenue: $${salesData.totalRevenue}`;
+        } else {
+          salesChart.textContent = "No sales data available.";
+        }
+      }
+      function displayPaymentDetails(payment) {
+        switch (payment.payment_method) {
+          case "paypal":
+            return `PayPal Email: ${
+              payment.payment_details?.paypal_email || "N/A"
+            }`;
+          case "venmo":
+            return `Venmo Username: ${
+              payment.payment_details?.venmo_username || "N/A"
+            }`;
+          case "cashapp":
+            return `CashApp Username: ${
+              payment.payment_details?.cashapp_username || "N/A"
+            }`;
+          default:
+            return "No payment details available";
+        }
+      }
+      async function loadPayments() {
+        paymentsData = await fetchData("http://localhost:3000/admin/payments");
+        const paymentsTableBody = document
+          .getElementById("paymentsTable")
+          .querySelector("tbody");
+        paymentsTableBody.innerHTML = "";
+        console.log(paymentsData);
+
+        if (paymentsData) {
+          paymentsData.forEach((payment) => {
+            let paymentDetails = "";
+
+            // Check the payment method and extract the corresponding details
+            if (payment.payment_method === "paypal") {
+              paymentDetails = `PayPal Email: ${
+                payment.payment_details?.paypal_email || "N/A"
+              }`;
+            } else if (payment.payment_method === "venmo") {
+              paymentDetails = `Venmo Username: ${
+                payment.payment_details?.venmo_username || "N/A"
+              }`;
+            } else if (payment.payment_method === "cashapp") {
+              paymentDetails = `CashApp Username: ${
+                payment.payment_details?.cashapp_username || "N/A"
+              }`;
+            } else {
+              paymentDetails = "No payment details available";
+            }
+
+            const row = document.createElement("tr");
+            row.innerHTML = `
+        <td>${payment.name}</td>
+        <td>${payment.payment_method}</td>
+        <td>${displayPaymentDetails(payment)}</td>
+      `;
+            paymentsTableBody.appendChild(row);
+          });
+        } else {
+          paymentsTableBody.innerHTML =
+            "<tr><td colspan='3'>No payment data available.</td></tr>";
+        }
+      }
+
+      loadDashboardOverview();
+
+      // sale report section
+      async function loadAdminSalesChartData() {
+        const token = localStorage.getItem("adminToken");
+
+        try {
+          const response = await fetch(
+            "http://localhost:3000/admin/sales-chart",
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          if (!response.ok) throw new Error("Failed to fetch sales data");
+          const salesData = await response.json();
+
+          // console.log(salesData);
+          // Prepare data for the chart
+          const labels = [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+          ];
+
+          // Initialize arrays with 0 for each month
+          const totalSales = Array(12).fill(0);
+          const totalRevenue = Array(12).fill(0);
+
+          // Fill in the data from the salesData response
+          salesData.forEach((item) => {
+            const monthIndex = item._id - 1; // MongoDB months are 1-based, JavaScript arrays are 0-based
+            totalSales[monthIndex] = item.totalSales || 0;
+            totalRevenue[monthIndex] = item.totalRevenue || 0;
+          });
+
+          // Debugging logs
+          // console.log("Labels:", labels);
+          // console.log("Total Earnings:", totalRevenue);
+          // console.log("Total Sales:", totalSales);
+
+          // Render the chart
+          renderAdminSalesChart(labels, totalSales, totalRevenue);
+        } catch (error) {
+          console.error("Error loading sales chart data:", error);
+        }
+      }
+
+      // Function to render the combination chart using Chart.js
+      function renderAdminSalesChart(labels, totalSales, totalRevenue) {
+        const ctx = document
+          .getElementById("adminSalesChartCanvas")
+          .getContext("2d");
+
+        // Destroy previous chart instance if it exists
+        if (
+          window.adminSalesChart &&
+          typeof window.adminSalesChart.destroy === "function"
+        ) {
+          window.adminSalesChart.destroy();
+        }
+
+        // Create a new chart instance
+        window.adminSalesChart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Total Revenue ($)",
+                data: totalRevenue,
+                backgroundColor: "rgba(75, 192, 192, 0.6)",
+                borderColor: "rgba(75, 192, 192, 1)",
+                borderWidth: 1,
+                yAxisID: "yRevenue",
+              },
+              {
+                label: "Total Sales (Count)",
+                data: totalSales,
+                backgroundColor: "rgba(153, 102, 255, 0.6)",
+                borderColor: "rgba(153, 102, 255, 1)",
+                borderWidth: 1,
+                yAxisID: "ySales",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                display: true,
+                position: "top",
+              },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    if (context.dataset.label === "Total Revenue ($)") {
+                      return `Revenue: $${context.raw.toFixed(2)}`;
+                    } else {
+                      return `Sales: ${context.raw}`;
+                    }
+                  },
+                },
+              },
+              datalabels: {
+                anchor: "end",
+                align: "top",
+                formatter: function (value) {
+                  return value > 0 ? value : "";
+                },
+              },
+            },
+            scales: {
+              yRevenue: {
+                beginAtZero: true,
+                max: 1000, // Maximum for revenue
+                position: "left",
+                title: {
+                  display: true,
+                  text: "Revenue ($)",
+                },
+              },
+              ySales: {
+                beginAtZero: true,
+                max: 100, // Maximum for sales count
+                position: "right",
+                title: {
+                  display: true,
+                  text: "Sales Count",
+                },
+              },
+            },
+          },
+          plugins: [ChartDataLabels],
+        });
+      }
+
+      // Load sales data when the "Sales Reports" section is clicked
+      document
+        .querySelector('[data-section="sales"]')
+        .addEventListener("click", loadAdminSalesChartData);
+
+      window.addEventListener("click", () => {
+        // alert("clicked");
+        // closeTemplateModal();
+        // closeModal();
+      });
+
+      async function updateTemplateStatus(templateId, newStatus) {
+        const response = await fetch(
+          "http://localhost:3000/admin/update-status",
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ templateId, status: newStatus }),
+          }
+        );
+
+        if (response.ok) {
+          alert("Status updated successfully");
+          loadTemplates(); // Reload templates list
+        } else {
+          alert("Failed to update status");
+        }
+      }
+
+      async function assignUpc(templateId) {
+        const upc = document.getElementById("upcInput").value;
+        if (!upc) {
+          alert("Please enter a valid UPC code");
+          return;
+        }
+
+        const response = await fetch("http://localhost:3000/admin/assign-upc", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ templateId, upc }),
+        });
+
+        if (response.ok) {
+          alert("UPC assigned successfully");
+          loadTemplates(); // Reload templates list
+        } else {
+          alert("Failed to assign UPC");
+        }
+      }
+    </script>
+  </body>
+</html>

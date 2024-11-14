@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Designer Registration</title>
+    <style>
+      .designer-register-container {
+        width: 80%;
+        margin: auto;
+      }
+
+      .conditional-field {
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="designer-register-container">
+      <h1>Designer Registration</h1>
+      <form id="registerForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required /><br /><br />
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required /><br /><br />
+        <label for="password">Password:</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          required
+        /><br /><br />
+        <label for="social">Last 4 of Social Security:</label>
+        <input
+          type="text"
+          id="social"
+          name="social"
+          maxlength="4"
+          required
+        /><br /><br />
+        <label for="phone">Phone Number:</label>
+        <input type="tel" id="phone" name="phone" required /><br /><br />
+        <label for="payment_method">Preferred Payment Method:</label>
+        <select id="payment_method" name="payment_method" required>
+          <option value="">Select a Payment Method</option>
+          <option value="paypal">PayPal</option>
+          <option value="venmo">Venmo</option>
+          <option value="cashapp">Cash App</option></select
+        ><br /><br />
+        <div id="paypal_email" class="conditional-field">
+          <label for="paypal_email_input">PayPal Email:</label>
+          <input
+            type="email"
+            id="paypal_email_input"
+            name="paypal_email"
+          /><br /><br />
+        </div>
+        <div id="venmo_username" class="conditional-field">
+          <label for="venmo_username_input">Venmo Username:</label>
+          <input
+            type="text"
+            id="venmo_username_input"
+            name="venmo_username"
+          /><br /><br />
+        </div>
+        <div id="cashapp_username" class="conditional-field">
+          <label for="cashapp_username_input"
+            >Cash App Username ($Cashtag):</label
+          >
+          <input
+            type="text"
+            id="cashapp_username_input"
+            name="cashapp_username"
+          /><br /><br />
+        </div>
+        <button type="submit">Register</button>
+      </form>
+    </div>
+
+    <script>
+      document
+        .getElementById("registerForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          const formData = new FormData(event.target);
+          const data = Object.fromEntries(formData.entries());
+          console.log("Data being sent:", data);
+
+          fetch("http://localhost:3000/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          })
+            .then(async (response) => {
+              const text = await response.text();
+              console.log("Raw server response:", text);
+              return JSON.parse(text);
+            })
+            .then((result) => {
+              console.log("Parsed response:", result);
+              if (result.message) {
+                alert(result.message);
+              } else {
+                alert("Registration failed. Please try again.");
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              alert("Registration failed. Please try again.");
+            });
+        });
+
+      document
+        .getElementById("payment_method")
+        .addEventListener("change", function () {
+          const method = this.value;
+          document
+            .querySelectorAll(".conditional-field")
+            .forEach((field) => (field.style.display = "none"));
+          if (method === "paypal") {
+            document.getElementById("paypal_email").style.display = "block";
+          } else if (method === "venmo") {
+            document.getElementById("venmo_username").style.display = "block";
+          } else if (method === "cashapp") {
+            document.getElementById("cashapp_username").style.display = "block";
+          }
+        });
+    </script>
+  </body>
+</html>
