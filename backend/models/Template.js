@@ -7,17 +7,16 @@ const templateSchema = new mongoose.Schema({
     required: true,
   },
   description: { type: String, required: true },
-  sku: { type: String, required: true },
-  images: [{ type: String, required: true }],
+  sku: { type: String },
+  upc: { type: String, default: "" }, // UPC initially empty
+  images: [{ type: String }],
   status: {
     type: String,
-    enum: ["pending", "In Progress", "Templated"],
+    enum: ["pending", "approved", "rejected"],
     default: "pending",
   },
   sales_count: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
-  upc: { type: String, default: "Admin will assign" }, // New field for UPC code
 });
 
-const Template = mongoose.model("Template", templateSchema);
-module.exports = Template;
+module.exports = mongoose.model("Template", templateSchema);

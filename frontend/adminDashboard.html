@@ -229,14 +229,13 @@
           <h3 id="modalDescription"></h3>
           <p>Status: <span id="modalStatus"></span></p>
           <p>Sales Count: <span id="modalSalesCount"></span></p>
-          <p>
-            <label for="upcInput">Assign UPC Code:</label>
-            <input
-              type="text"
-              id="upcInput"
-              placeholder="Enter UPC code here"
-            />
-          </p>
+
+          <!-- UPC input and edit button in your modal -->
+          <label for="upcInput" id="upcLabel">Assign UPC Code:</label>
+          <input type="text" id="upcInput" placeholder="Enter UPC code here" />
+          <p>Assigned UPC: <span id="assignedUpc"></span></p>
+          <button id="editUpcButton" style="display: none">Edit UPC</button>
+
           <img
             id="largeImage"
             src=""
@@ -398,6 +397,7 @@
         templatesData = await fetchData(
           "http://localhost:3000/admin/templates"
         );
+        console.log(templatesData);
         // console.log(templatesData);
         if (templatesData) {
           displayTemplates(templatesData);
@@ -455,15 +455,34 @@
       async function viewTemplateDetails(templateId) {
         const template = templatesData.find((t) => t._id === templateId);
         if (!template) return;
-
+        console.log(template.upc);
         selectedTemplateId = templateId; // Store the current template ID
         const modal = document.getElementById("templateModal");
+
         document.getElementById("modalDescription").textContent =
           template.description;
         document.getElementById("modalStatus").textContent = template.status;
         document.getElementById("modalSalesCount").textContent =
           template.sales_count || 0;
 
+        const upcInput = document.getElementById("upcInput");
+        const upcLabel = document.getElementById("upcLabel");
+        const editUpcButton = document.getElementById("editUpcButton");
+        const assignedUpcText = document.getElementById("assignedUpc");
+
+        if (template.upc) {
+          upcLabel.style.display = "none";
+          upcInput.style.display = "none";
+          editUpcButton.style.display = "inline-block";
+          assignedUpcText.textContent = template.upc;
+        } else {
+          upcLabel.style.display = "inline-block";
+          upcInput.style.display = "inline-block";
+          editUpcButton.style.display = "none";
+          upcInput.value = "";
+        }
+
+        // upcInput.value = template.upc || "";
         // Display all images in the modal
         const thumbnails = document.getElementById("imageThumbnails");
         thumbnails.innerHTML = "";
@@ -487,18 +506,33 @@
       // document.getElementById("closeModal").addEventListener("click", () => {});
 
       async function approveTemplate() {
-        const upcCode = document.getElementById("upcInput").value;
-
-        if (!selectedTemplateId) {
-          alert("No template selected");
-          return;
-        }
-        if (!upcCode) {
-          alert("Please enter a UPC code before approving.");
-          return;
-        }
+        if (!selectedTemplateId) return;
+        const upcInput = document.getElementById("upcInput").value;
 
         try {
+          // Assign the UPC code if entered
+          if (upcInput) {
+            const assignResponse = await fetch(
+              "http://localhost:3000/admin/assign-upc",
+              {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                  templateId: selectedTemplateId,
+                  upc: upcInput,
+                }),
+              }
+            );
+
+            if (!assignResponse.ok) {
+              throw new Error("Failed to assign UPC");
+            }
+          }
+
+          // Approve the template
           const response = await fetch(
             `http://localhost:3000/admin/approve-template/${selectedTemplateId}`,
             {
@@ -507,15 +541,13 @@
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
               },
-              body: JSON.stringify({ upc: upcCode }),
             }
           );
 
           if (response.ok) {
-            alert("Template approved and UPC assigned successfully");
-            closeModal();
+            alert("Template approved successfully");
             closeTemplateModal();
-            loadTemplates(); // Refresh templates list
+            loadTemplates(); // Reload the templates list
           } else {
             alert("Failed to approve template");
           }

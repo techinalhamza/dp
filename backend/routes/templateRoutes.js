@@ -83,4 +83,26 @@ router.post("/update-sales", authenticateToken, async (req, res) => {
     res.status(500).json({ message: "Failed to update sales count" });
   }
 });
+
+// Route to assign UPC code
+router.put("/assign-upc", async (req, res) => {
+  const { templateId, upc } = req.body;
+
+  try {
+    const template = await Template.findById(templateId);
+    if (template) {
+      template.upc = upc;
+      await template.save();
+      return res
+        .status(200)
+        .json({ message: "UPC assigned successfully", template });
+    } else {
+      return res.status(404).json({ message: "Template not found" });
+    }
+  } catch (error) {
+    console.error("Error assigning UPC:", error);
+    return res.status(500).json({ message: "Error assigning UPC" });
+  }
+});
+
 module.exports = router;

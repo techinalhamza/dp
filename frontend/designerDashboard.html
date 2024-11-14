@@ -635,12 +635,13 @@
         }
 
         // Display templates in the "Uploaded Templates" section
-        // Display templates in the "Uploaded Templates" section
         function displayTemplates(templates) {
+          console.log(templates);
           const templateList = document.getElementById("templateList");
           templateList.innerHTML = "";
 
           templates.forEach((template) => {
+            console.log(template);
             const card = document.createElement("div");
             card.classList.add("template-card");
 
@@ -661,8 +662,7 @@
             const status = document.createElement("p");
             status.textContent = `Status: ${template.status}`;
             details.appendChild(status);
-
-            // UPC code
+            // upc code
             const upc = document.createElement("p");
             upc.textContent = `UPC: ${template.upc || "Admin will assign"}`;
             details.appendChild(upc);
@@ -812,9 +812,9 @@
               totalEarnings[monthIndex] = item.totalEarnings;
             });
             // Debugging logs
-            console.log("Labels:", labels);
-            console.log("Total Earnings:", totalEarnings);
-            console.log("Total Sales:", totalSales);
+            // console.log("Labels:", labels);
+            // console.log("Total Earnings:", totalEarnings);
+            // console.log("Total Sales:", totalSales);
             // Render the chart
             renderSalesChart(labels, totalSales, totalEarnings);
           } catch (error) {

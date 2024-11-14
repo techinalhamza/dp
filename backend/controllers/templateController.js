@@ -68,7 +68,7 @@ exports.getDesignerTemplates = async (req, res) => {
 
     // Fetch all templates for the current designer
     const templates = await Template.find({ designerId }).select(
-      "description images sku status sales_count createdAt"
+      "description images sku status sales_count createdAt upc"
     );
 
     // Calculate earnings for each template
@@ -184,22 +184,66 @@ exports.updateTemplateStatus = async (req, res) => {
 // };
 
 // Route to assign UPC code
+// exports.assignUpc = async (req, res) => {
+//   const { templateId, upc } = req.body;
+
+//   try {
+//     const template = await Template.findById(templateId);
+//     if (template) {
+//       template.upc = upc;
+//       template.status = "approved";
+//       await template.save();
+//       res.status(200).json({ message: "UPC assigned successfully", template });
+//     } else {
+//       res.status(404).json({ message: "Template not found" });
+//     }
+//   } catch (error) {
+//     console.error("Error assigning UPC:", error);
+//     res.status(500).json({ message: "Error assigning UPC" });
+//   }
+// };
+
+// app.put("/admin/assign-upc", async (req, res) => {
+//   const { templateId, upc } = req.body;
+
+//   try {
+//     const template = await Template.findById(templateId);
+//     if (template) {
+//       // Update the UPC code and save
+//       template.upc = upc;
+//       await template.save();
+
+//       res.status(200).json({ message: "UPC assigned successfully", template });
+//     } else {
+//       res.status(404).json({ message: "Template not found" });
+//     }
+//   } catch (error) {
+//     console.error("Error assigning UPC:", error);
+//     res.status(500).json({ message: "Error assigning UPC" });
+//   }
+// });
+
+/// Assign or update UPC in templateController.js
 exports.assignUpc = async (req, res) => {
   const { templateId, upc } = req.body;
 
   try {
     const template = await Template.findById(templateId);
-    if (template) {
-      template.upc = upc;
-      template.status = "approved";
-      await template.save();
-      res.status(200).json({ message: "UPC assigned successfully", template });
-    } else {
-      res.status(404).json({ message: "Template not found" });
+    if (!template) {
+      return res.status(404).json({ message: "Template not found" });
     }
+
+    // Assign or update the UPC
+    template.upc = upc;
+    template.status = "approved"; // Make sure status updates to 'approved'
+    await template.save();
+
+    return res
+      .status(200)
+      .json({ message: "UPC assigned successfully", template });
   } catch (error) {
     console.error("Error assigning UPC:", error);
-    res.status(500).json({ message: "Error assigning UPC" });
+    return res.status(500).json({ message: "Error assigning UPC" });
   }
 };
 
