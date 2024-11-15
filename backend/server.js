@@ -11,6 +11,7 @@ const templateRoutes = require("./routes/templateRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 require("./config/database"); // Connect to the database
 const notificationRoutes = require("./routes/notificationRoutes");
+const shopifyRoutes = require("./routes/shopifyRoutes");
 
 const app = express();
 const corsOptions = {
@@ -19,9 +20,9 @@ const corsOptions = {
   credentials: true, // Allow credentials (cookies) to be sent
 };
 
-app.get('/', (req, res)=>{
-  res.send('welcom to your live server')
-})
+app.get("/", (req, res) => {
+  res.send("welcom to your live server");
+});
 
 // Middleware setup
 app.use(cors(corsOptions));
@@ -36,6 +37,9 @@ app.use("/auth", authRoutes);
 app.use("/designer", designerRoutes);
 app.use("/template", templateRoutes); // Use the template routes with the "/template" prefix
 app.use("/admin", adminRoutes);
+
+// Use the Shopify routes
+app.use("/shopify", shopifyRoutes);
 
 // notifiction route
 app.use("/notifications", notificationRoutes);

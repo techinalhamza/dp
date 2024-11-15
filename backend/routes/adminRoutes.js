@@ -44,6 +44,8 @@ router.get(
 router.get("/payments", authenticateAdmin, adminController.getPayments);
 // Route to assign UPC code
 router.put("/assign-upc", authenticateAdmin, templateController.assignUpc);
+// Route to update the UPC code
+router.put("/edit-upc", authenticateAdmin, templateController.updateUpcCode);
 
 // Route to fetch templates that need UPC assignment
 router.get(

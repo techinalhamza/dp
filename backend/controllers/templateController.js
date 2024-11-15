@@ -159,70 +159,6 @@ exports.updateTemplateStatus = async (req, res) => {
   }
 };
 
-// Assign UPC code
-// exports.assignUpc = async (req, res) => {
-//   const { templateId, upc } = req.body;
-
-//   try {
-//     const template = await Template.findById(templateId);
-//     if (!template)
-//       return res.status(404).json({ message: "Template not found" });
-
-//     if (template.status !== "Templated") {
-//       return res.status(400).json({
-//         message: "Template must be in 'Templated' status to assign a UPC",
-//       });
-//     }
-
-//     template.upc = upc;
-//     await template.save();
-//     res.json({ message: "UPC assigned successfully", template });
-//   } catch (error) {
-//     console.error("Error assigning UPC:", error);
-//     res.status(500).json({ message: "Failed to assign UPC" });
-//   }
-// };
-
-// Route to assign UPC code
-// exports.assignUpc = async (req, res) => {
-//   const { templateId, upc } = req.body;
-
-//   try {
-//     const template = await Template.findById(templateId);
-//     if (template) {
-//       template.upc = upc;
-//       template.status = "approved";
-//       await template.save();
-//       res.status(200).json({ message: "UPC assigned successfully", template });
-//     } else {
-//       res.status(404).json({ message: "Template not found" });
-//     }
-//   } catch (error) {
-//     console.error("Error assigning UPC:", error);
-//     res.status(500).json({ message: "Error assigning UPC" });
-//   }
-// };
-
-// app.put("/admin/assign-upc", async (req, res) => {
-//   const { templateId, upc } = req.body;
-
-//   try {
-//     const template = await Template.findById(templateId);
-//     if (template) {
-//       // Update the UPC code and save
-//       template.upc = upc;
-//       await template.save();
-
-//       res.status(200).json({ message: "UPC assigned successfully", template });
-//     } else {
-//       res.status(404).json({ message: "Template not found" });
-//     }
-//   } catch (error) {
-//     console.error("Error assigning UPC:", error);
-//     res.status(500).json({ message: "Error assigning UPC" });
-//   }
-// });
-
 /// Assign or update UPC in templateController.js
 exports.assignUpc = async (req, res) => {
   const { templateId, upc } = req.body;
@@ -258,5 +194,37 @@ exports.getPendingTemplatesForUPC = async (req, res) => {
   } catch (error) {
     console.error("Error fetching templates needing UPC:", error);
     res.status(500).json({ message: "Error fetching templates." });
+  }
+};
+
+// templateController.js
+
+exports.updateUpcCode = async (req, res) => {
+  const { templateId, newUpc } = req.body;
+
+  if (!newUpc || !templateId) {
+    return res
+      .status(400)
+      .json({ message: "UPC and template ID are required" });
+  }
+
+  try {
+    // Find the template by ID
+    const template = await Template.findById(templateId);
+
+    if (!template) {
+      return res.status(404).json({ message: "Template not found" });
+    }
+
+    // Update the UPC code
+    template.upc = newUpc;
+    await template.save();
+
+    return res
+      .status(200)
+      .json({ message: "UPC updated successfully", template });
+  } catch (error) {
+    console.error("Error updating UPC:", error);
+    return res.status(500).json({ message: "Failed to update UPC" });
   }
 };

@@ -105,4 +105,36 @@ router.put("/assign-upc", async (req, res) => {
   }
 });
 
+// edit or update upc code
+
+exports.updateUpcCode = async (req, res) => {
+  const { templateId, newUpc } = req.body;
+
+  if (!newUpc || !templateId) {
+    return res
+      .status(400)
+      .json({ message: "UPC and template ID are required" });
+  }
+
+  try {
+    // Find the template by ID
+    const template = await Template.findById(templateId);
+
+    if (!template) {
+      return res.status(404).json({ message: "Template not found" });
+    }
+
+    // Update the UPC code
+    template.upc = newUpc;
+    await template.save();
+
+    return res
+      .status(200)
+      .json({ message: "UPC updated successfully", template });
+  } catch (error) {
+    console.error("Error updating UPC:", error);
+    return res.status(500).json({ message: "Failed to update UPC" });
+  }
+};
+
 module.exports = router;

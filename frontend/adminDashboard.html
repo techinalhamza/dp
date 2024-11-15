@@ -223,14 +223,59 @@
       </div>
 
       <!-- Template Details Modal -->
+      <!-- Template Details Modal -->
       <div id="templateModal" style="display: none">
         <div class="modal-content">
           <button id="closeModal" onclick="closeTemplateModal()">Close</button>
           <h3 id="modalDescription"></h3>
           <p>Status: <span id="modalStatus"></span></p>
           <p>Sales Count: <span id="modalSalesCount"></span></p>
+          <p>UPC: <span id="assignedUpc"></span></p>
 
-          <!-- UPC input and edit button in your modal -->
+          <!-- UPC Input Field and Buttons -->
+          <input
+            type="text"
+            id="editUpcInput"
+            style="display: none"
+            placeholder="Enter new UPC"
+          />
+          <button
+            id="saveUpcButton"
+            style="display: none"
+            onclick="saveUpcCode()"
+          >
+            Save UPC
+          </button>
+          <button id="editUpcButton" onclick="enableUpcEdit()">Edit UPC</button>
+
+          <!-- Image Section -->
+          <img
+            id="largeImage"
+            src=""
+            style="width: 100%; height: auto"
+            alt="Large Image"
+          />
+          <div
+            id="imageThumbnails"
+            style="display: flex; gap: 10px; margin-top: 20px"
+          ></div>
+
+          <!-- Approve/Reject Buttons -->
+          <div style="margin-top: 20px">
+            <button id="approveButton">Approve</button>
+            <button id="rejectButton" class="reject">Reject</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- <div id="templateModal" style="display: none">
+        <div class="modal-content">
+          <button id="closeModal" onclick="closeTemplateModal()">Close</button>
+          <h3 id="modalDescription"></h3>
+          <p>Status: <span id="modalStatus"></span></p>
+          <p>Sales Count: <span id="modalSalesCount"></span></p>
+
+          UPC input and edit button in your modal
           <label for="upcInput" id="upcLabel">Assign UPC Code:</label>
           <input type="text" id="upcInput" placeholder="Enter UPC code here" />
           <p>Assigned UPC: <span id="assignedUpc"></span></p>
@@ -247,13 +292,13 @@
             style="display: flex; gap: 10px; margin-top: 20px; width: 10%"
           ></div>
 
-          <!-- Approve/Reject Buttons -->
+          Approve/Reject Buttons
           <div style="margin-top: 20px">
             <button id="approveButton">Approve</button>
             <button id="rejectButton" class="reject">Reject</button>
           </div>
         </div>
-      </div>
+      </div> -->
 
       <!-- Sales Reports Section -->
       <div id="sales" class="section">
@@ -465,19 +510,20 @@
         document.getElementById("modalSalesCount").textContent =
           template.sales_count || 0;
 
-        const upcInput = document.getElementById("upcInput");
-        const upcLabel = document.getElementById("upcLabel");
+        const upcInput = document.getElementById("editUpcInput");
         const editUpcButton = document.getElementById("editUpcButton");
         const assignedUpcText = document.getElementById("assignedUpc");
+        const saveUpcButton = document.getElementById("saveUpcButton");
 
+        // Check if UPC is already assigned
         if (template.upc) {
-          upcLabel.style.display = "none";
           upcInput.style.display = "none";
+          saveUpcButton.style.display = "none";
           editUpcButton.style.display = "inline-block";
           assignedUpcText.textContent = template.upc;
         } else {
-          upcLabel.style.display = "inline-block";
           upcInput.style.display = "inline-block";
+          saveUpcButton.style.display = "inline-block";
           editUpcButton.style.display = "none";
           upcInput.value = "";
         }
@@ -498,6 +544,49 @@
 
         modal.style.display = "flex";
       }
+
+      // Function to enable UPC editing
+      function enableUpcEdit() {
+        document.getElementById("editUpcInput").style.display = "inline-block";
+        document.getElementById("saveUpcButton").style.display = "inline-block";
+        document.getElementById("editUpcButton").style.display = "none";
+      }
+
+      // Function to save the updated UPC
+      async function saveUpcCode() {
+        const newUpc = document.getElementById("editUpcInput").value;
+        if (!newUpc) {
+          alert("Please enter a UPC code");
+          return;
+        }
+
+        try {
+          const response = await fetch("http://localhost:3000/admin/edit-upc", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              templateId: selectedTemplateId,
+              newUpc: newUpc,
+            }),
+          });
+
+          const result = await response.json();
+          if (response.ok) {
+            alert("UPC updated successfully");
+            document.getElementById("assignedUpc").textContent = newUpc;
+            closeTemplateModal();
+            loadTemplates();
+          } else {
+            alert(result.message || "Failed to update UPC");
+          }
+        } catch (error) {
+          console.error("Error updating UPC:", error);
+        }
+      }
+
       // Close the modal
 
       function closeTemplateModal() {
@@ -507,11 +596,11 @@
 
       async function approveTemplate() {
         if (!selectedTemplateId) return;
-        const upcInput = document.getElementById("upcInput").value;
+        const editUpcInput = document.getElementById("editUpcInput").value;
 
         try {
           // Assign the UPC code if entered
-          if (upcInput) {
+          if (editUpcInput) {
             const assignResponse = await fetch(
               "http://localhost:3000/admin/assign-upc",
               {
@@ -522,7 +611,7 @@
                 },
                 body: JSON.stringify({
                   templateId: selectedTemplateId,
-                  upc: upcInput,
+                  upc: editUpcInput,
                 }),
               }
             );
