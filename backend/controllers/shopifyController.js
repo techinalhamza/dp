@@ -1,44 +1,59 @@
-// shopifyController.js
 const { Template } = require("../models");
 const crypto = require("crypto");
 
-// Shopify webhook secret key (get this from your Shopify admin panel)
 const SHOPIFY_WEBHOOK_SECRET =
-  "5345a85108adc0a0389e25d0523e0c31fc284c5eafea7c2ec95c83a2476cc3b3";
+  "5345a85108adc0a0389e25d0523e0c31fc284c5eafea7c2ec95c83a2476cc3b3"; // Your actual secret key
 
-// Function to verify the Shopify webhook signature
+// Function to verify Shopify webhook signature
 const verifyShopifySignature = (req) => {
   const hmac = req.headers["x-shopify-hmac-sha256"];
-  const body = JSON.stringify(req.body);
+  if (!hmac) {
+    console.error("Missing HMAC header");
+    return false;
+  }
+
+  // Use the raw body from req.rawBody
+  const rawBody = req.rawBody;
+  if (!rawBody) {
+    console.error("Missing raw body for HMAC verification");
+    return false;
+  }
+
+  // Generate the HMAC using the raw body
   const generatedHmac = crypto
     .createHmac("sha256", SHOPIFY_WEBHOOK_SECRET)
-    .update(body, "utf8")
+    .update(rawBody)
     .digest("base64");
 
+  console.log("HMAC from Shopify:", hmac);
+  console.log("Generated HMAC:", generatedHmac);
+
   return crypto.timingSafeEqual(
-    Buffer.from(hmac || "", "utf8"),
+    Buffer.from(hmac, "utf8"),
     Buffer.from(generatedHmac, "utf8")
   );
 };
 
-// Handle Shopify webhook
+// Handle the Shopify webhook
 exports.handleShopifyWebhook = async (req, res) => {
   try {
-    // Verify the Shopify webhook signature
     if (!verifyShopifySignature(req)) {
       console.error("Unauthorized: Invalid Shopify signature");
       return res.status(401).send("Unauthorized: Invalid Shopify signature");
     }
 
     console.log("Webhook received:", req.body);
+    console.log("Raw Body:", req.rawBody);
+    console.log("Parsed Body:", req.body);
+    console.log("Raw Body Length:", Buffer.byteLength(req.rawBody));
+    console.log(
+      "Parsed Body Length:",
+      Buffer.byteLength(JSON.stringify(req.body))
+    );
 
     const { line_items } = req.body;
-
-    // Process each line item
     for (const item of line_items) {
       const sku = item.sku;
-
-      // Find the template by SKU and update sales count
       const template = await Template.findOne({ sku });
       if (template) {
         template.sales_count += item.quantity;

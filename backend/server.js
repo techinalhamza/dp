@@ -23,6 +23,14 @@ const corsOptions = {
 app.get("/", (req, res) => {
   res.send("welcom to your live server");
 });
+app.use(
+  "/shopify/orders",
+  bodyParser.json({
+    verify: (req, res, buf) => {
+      req.rawBody = buf.toString("utf8");
+    },
+  })
+);
 
 // Middleware setup
 app.use(cors(corsOptions));
