@@ -517,11 +517,15 @@
 
         // Check if UPC is already assigned
         if (template.upc) {
+          upcInput.value = "";
+          assignedUpcText.textContent = "";
           upcInput.style.display = "none";
           saveUpcButton.style.display = "none";
           editUpcButton.style.display = "inline-block";
           assignedUpcText.textContent = template.upc;
         } else {
+          upcInput.value = "";
+          assignedUpcText.textContent = "";
           upcInput.style.display = "inline-block";
           saveUpcButton.style.display = "inline-block";
           editUpcButton.style.display = "none";
