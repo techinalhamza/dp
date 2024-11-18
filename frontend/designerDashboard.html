@@ -132,27 +132,6 @@
         font-weight: bold;
         color: #333;
       }
-      /* .stats-container {
-        display: flex;
-        gap: 20px;
-        margin-top: 20px;
-      }
-      .card {
-        background-color: #f5f5f5;
-        padding: 20px;
-        border-radius: 10px;
-        text-align: center;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      }
-      .card h3 {
-        margin-bottom: 10px;
-        font-size: 18px;
-      }
-      .card p {
-        font-size: 24px;
-        color: #333;
-        font-weight: bold;
-      } */
 
       .conditional-field {
         display: none;
@@ -189,6 +168,38 @@
         cursor: pointer;
         margin: 5px;
         border-radius: 8px;
+      }
+      .image-upload-container {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .image-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 150px;
+        height: 150px;
+        border: 2px dashed #ccc;
+        border-radius: 10px;
+        cursor: pointer;
+        position: relative;
+      }
+
+      .image-box input[type="file"] {
+        opacity: 0;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+      }
+
+      .image-box img {
+        max-width: 100%;
+        max-height: 100%;
+        display: none;
       }
 
       @keyframes spin {
@@ -271,28 +282,59 @@
               <p id="totalEarnings">$0.00</p>
             </div>
           </div>
-          <!-- <div class="dashboard-cards" id="dashboardCards">
-            <div class="card">
-              <h3>Total Sales</h3>
-              <p id="totalSales">$0</p>
-            </div>
-            <div class="card">
-              <h3>Approved Templates</h3>
-              <p id="approvedTemplates">0</p>
-            </div>
-            <div class="card">
-              <h3>Pending Templates</h3>
-              <p id="pendingTemplates">0</p>
-            </div>
-            <div class="card">
-              <h3>Rejected Templates</h3>
-              <p id="rejectedTemplates">0</p>
-            </div>
-          </div> -->
         </div>
 
         <!-- Add New Template Section -->
+        <!-- Add New Template Section -->
         <div id="upload-section" class="section">
+          <h2>Add New Template</h2>
+          <form id="templateForm">
+            <label for="description">Description:</label><br />
+            <input
+              type="text"
+              id="description"
+              name="description"
+              required
+            /><br /><br />
+
+            <label for="sku">SKU:</label><br />
+            <input
+              type="text"
+              id="sku"
+              name="sku"
+              readonly
+              style="display: none"
+            /><br />
+            <p id="skuPlaceholder">Generating SKU for your design...</p>
+            <input type="hidden" id="hiddenSku" name="hiddenSku" />
+            <br /><br />
+
+            <h3>Upload Images (4 maximum):</h3>
+            <div class="image-upload-container">
+              <div class="image-box">
+                <input type="file" id="image1" name="image1" accept="image/*" />
+                <img id="preview1" src="" alt="Image 1" />
+              </div>
+              <div class="image-box">
+                <input type="file" id="image2" name="image2" accept="image/*" />
+                <img id="preview2" src="" alt="Image 2" />
+              </div>
+              <div class="image-box">
+                <input type="file" id="image3" name="image3" accept="image/*" />
+                <img id="preview3" src="" alt="Image 3" />
+              </div>
+              <div class="image-box">
+                <input type="file" id="image4" name="image4" accept="image/*" />
+                <img id="preview4" src="" alt="Image 4" />
+              </div>
+            </div>
+            <br /><br />
+
+            <button type="submit">Upload Template</button>
+          </form>
+        </div>
+
+        <!-- <div id="upload-section" class="section">
           <h2>Add New Template</h2>
           <form id="templateForm">
             <label for="description">Description:</label><br />
@@ -310,15 +352,15 @@
               name="images"
               multiple
               accept="image/*"
-              required
             /><br /><br />
 
-            <label for="sku">SKU:</label><br />
-            <input type="text" id="sku" name="sku" required /><br /><br />
+            Placeholder for SKU
+            <p id="skuDisplay">Generating SKU for your design...</p>
+            <input type="hidden" id="hiddenSku" name="hiddenSku" />
 
             <button type="submit">Upload Template</button>
           </form>
-        </div>
+        </div> -->
 
         <!-- Uploaded Templates Section -->
         <div id="templates-section" class="section">
@@ -335,7 +377,6 @@
           <canvas id="salesChart" width="400" height="200"></canvas>
         </div>
 
-        <!-- Payment Information Section -->
         <!-- Payment Information Section -->
         <div id="payment-section" class="section">
           <h2>Update Payment Information</h2>
@@ -556,6 +597,85 @@
 
         // Call the function to load stats on page load
         loadDesignerStats();
+
+        // Function to auto-generate SKU when navigating to the "Add New Template" section
+        const imageInputs = [1, 2, 3, 4].map((i) => document.getElementById(`image${i}`));
+        const imagePreviews = [1, 2, 3, 4].map((i) => document.getElementById(`preview${i}`));
+        let skuGenerated = false;
+        let currentSku = "";
+
+        async function fetchSkuFromBackend() {
+          if (skuGenerated) return;
+
+          try {
+            const token = localStorage.getItem("token");
+            const response = await fetch(
+              "http://localhost:3000/template/generate-sku",
+              {
+                method: "GET",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+
+            if (response.ok) {
+              const data = await response.json();
+              if (data.sku) {
+                currentSku = data.sku;
+                document.getElementById(
+                  "skuDisplay"
+                ).textContent = `SKU: ${currentSku}`;
+                document.getElementById("hiddenSku").value = currentSku;
+                skuGenerated = true;
+              }
+            } else {
+              console.error("Failed to fetch SKU:", response.statusText);
+              alert("Failed to generate SKU. Please try again.");
+            }
+          } catch (error) {
+            console.error("Error fetching SKU:", error);
+            alert("Error generating SKU. Please try again.");
+          }
+        }
+
+        // Function to check user input
+        function checkForUserInput() {
+          const description = document
+            .getElementById("description")
+            .value.trim();
+          const images = document.getElementById("images").files;
+
+          // If any input is detected, fetch SKU
+          if ((description || images.length > 0) && !skuGenerated) {
+            fetchSkuFromBackend();
+          }
+        }
+
+        // Event listeners to trigger SKU generation
+        document
+          .getElementById("description")
+          .addEventListener("input", checkForUserInput);
+        document
+          .getElementById("images")
+          .addEventListener("change", checkForUserInput);
+
+          // Handle image preview
+  imageInputs.forEach((input, index) => {
+    input.addEventListener("change", function () {
+      const file = input.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          imagePreviews[index].src = e.target.result;
+          imagePreviews[index].style.display = "block";
+        };
+        reader.readAsDataURL(file);
+        checkForUserInput();
+      }
+    });
+  });
+
         // Handle form submission for uploading a new template
         document
           .getElementById("templateForm")
@@ -563,8 +683,13 @@
             event.preventDefault();
 
             const description = document.getElementById("description").value;
-            const sku = document.getElementById("sku").value;
             const imageFiles = document.getElementById("images").files;
+            const hiddenSku = document.getElementById("hiddenSku").value;
+
+            if (!hiddenSku) {
+              alert("Failed to generate SKU. Please try again.");
+              return;
+            }
 
             // Validate input
             if (imageFiles.length === 0) {
@@ -578,7 +703,7 @@
 
             const formData = new FormData();
             formData.append("description", description);
-            formData.append("sku", sku);
+            formData.append("hiddenSku", hiddenSku); // Pass the SKU to the backend
 
             // Append images to FormData
             for (let i = 0; i < imageFiles.length; i++) {
@@ -603,15 +728,14 @@
               const result = await response.json();
               if (response.ok) {
                 alert(result.message);
-                loadTemplates(); // Refresh templates list after upload
-                document.getElementById("templateForm").reset(); // Reset form
+                loadTemplates();
+                document.getElementById("templateForm").reset();
               } else {
                 alert(result.message || "Failed to upload template.");
               }
             } catch (error) {
               console.error("Error uploading template:", error);
             } finally {
-              // Hide the preloader after the process is complete
               preloader.style.display = "none";
             }
           });
@@ -636,12 +760,12 @@
 
         // Display templates in the "Uploaded Templates" section
         function displayTemplates(templates) {
-          console.log(templates);
+          // console.log(templates);
           const templateList = document.getElementById("templateList");
           templateList.innerHTML = "";
 
           templates.forEach((template) => {
-            console.log(template);
+            // console.log(template);
             const card = document.createElement("div");
             card.classList.add("template-card");
 
@@ -684,6 +808,7 @@
 
         // Open modal with template details
         function openModal(template) {
+          console.log(template);
           const commissionRate = 0.3;
           const pricePerTemplate = 100;
           const earnings =
@@ -756,7 +881,7 @@
 
             if (!response.ok) throw new Error("Failed to fetch sales data");
             const { totalRevenue, templates } = await response.json();
-            console.log(totalRevenue);
+            // console.log(totalRevenue);
             document.getElementById(
               "totalRevenue"
             ).textContent = `Total Revenue: $${totalRevenue}`;
@@ -835,7 +960,7 @@
             0
           );
 
-          console.log(overallTotalEarnings, overallTotalSales);
+          // console.log(overallTotalEarnings, overallTotalSales);
 
           // Check if a previous chart instance exists and destroy it safely
           if (
@@ -1020,5 +1145,7 @@
         }
       });
     </script>
+
+    
   </body>
 </html>

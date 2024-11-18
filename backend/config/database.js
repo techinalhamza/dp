@@ -1,8 +1,8 @@
 // database.js
 const mongoose = require("mongoose");
 
-const mongoURI =
-  "mongodb+srv://techinalhamza:techinalhamza@cluster0.3ycbz.mongodb.net";
+const mongoURI = process.env.MONGODB_URI;
+
 // Connect to MongoDB
 mongoose
   .connect(mongoURI)

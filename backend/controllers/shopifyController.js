@@ -1,8 +1,7 @@
-const { Template } = require("../models");
+const { Template, Designer } = require("../models");
 const crypto = require("crypto");
-
-const SHOPIFY_WEBHOOK_SECRET =
-  "5345a85108adc0a0389e25d0523e0c31fc284c5eafea7c2ec95c83a2476cc3b3"; // Your actual secret key
+const sendEmail = require("../services/emailService");
+const SHOPIFY_WEBHOOK_SECRET = process.env.SHOPIFY_WEBHOOK_SECRET; // Your actual secret key
 
 // Function to verify Shopify webhook signature
 const verifyShopifySignature = (req) => {
@@ -59,6 +58,20 @@ exports.handleShopifyWebhook = async (req, res) => {
         template.sales_count += item.quantity;
         await template.save();
         console.log(`Updated sales for SKU: ${sku}`);
+        // Notify the designer via email
+        const designer = await Designer.findById(template.designerId);
+        if (designer && designer.email) {
+          const subject = "🎉 Your Template Just Got Sold!";
+          const html = `
+            <h2>Congratulations ${designer.name}!</h2>
+            <p>Your template with SKU: <b>${sku}</b> was just sold.</p>
+            <p>Total Sales Count: ${template.sales_count}</p>
+            <p>Keep up the great work!</p>
+          `;
+
+          await sendEmail(designer.email, subject, html);
+          console.log(`Email sent to designer: ${designer.email}`);
+        }
       }
     }
 

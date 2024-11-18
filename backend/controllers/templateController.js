@@ -2,6 +2,7 @@ const { Template } = require("../models");
 const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
 const Notification = require("../models/Notification");
+const generateUniqueSku = require("../services/skuGenerator");
 
 // Configure Cloudinary
 cloudinary.config({
@@ -10,9 +11,8 @@ cloudinary.config({
   api_secret: "YfkCyzpwAgVpRQHME49FS-7YMXI",
 });
 
-// Upload a template with images to Cloudinary
 exports.uploadTemplate = async (req, res) => {
-  const { description, sku } = req.body;
+  const { description, hiddenSku } = req.body;
 
   // Check if files were uploaded
   if (!req.files || req.files.length === 0) {
@@ -31,11 +31,14 @@ exports.uploadTemplate = async (req, res) => {
       images.push(result.secure_url);
     }
 
+    // Use the SKU sent from the frontend, or generate a new one if not provided
+    const sku = hiddenSku || (await generateUniqueSku());
+
     // Save the template to the database with Cloudinary URLs
     const template = new Template({
       designerId: req.user.id,
       description,
-      sku,
+      sku, // Use the provided SKU
       images,
       status: "pending",
     });

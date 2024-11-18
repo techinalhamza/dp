@@ -6,6 +6,7 @@ const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
 const { Template } = require("../models");
+const generateUniqueSku = require("../services/skuGenerator");
 
 // Configure Cloudinary
 cloudinary.config({
@@ -33,7 +34,20 @@ router.post(
   upload.array("images", 4),
   templateController.uploadTemplate // Use the uploadTemplate function directly
 );
-
+// Route to get a new SKU
+router.get("/generate-sku", authenticateToken, async (req, res) => {
+  try {
+    const sku = await generateUniqueSku();
+    if (sku) {
+      res.status(200).json({ sku });
+    } else {
+      res.status(500).json({ message: "Failed to generate SKU" });
+    }
+  } catch (error) {
+    console.error("Error generating SKU:", error);
+    res.status(500).json({ message: "Error generating SKU" });
+  }
+});
 // Route for fetching all templates uploaded by the designer
 router.get("/", authenticateToken, templateController.getDesignerTemplates);
 
