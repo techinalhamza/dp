@@ -11,35 +11,44 @@ cloudinary.config({
   api_secret: "YfkCyzpwAgVpRQHME49FS-7YMXI",
 });
 
+// Generate a unique SKU
+exports.generateSku = async (req, res) => {
+  try {
+    const sku = await generateUniqueSku();
+    res.status(200).json({ sku });
+  } catch (error) {
+    console.error("Error generating SKU:", error);
+    res.status(500).json({ message: "Failed to generate SKU" });
+  }
+};
+// Upload a template with images
 exports.uploadTemplate = async (req, res) => {
   const { description, hiddenSku } = req.body;
-
-  // Check if files were uploaded
-  if (!req.files || req.files.length === 0) {
-    return res.status(400).json({ message: "No files were uploaded." });
-  }
-
   const images = [];
-  const uploadedFiles = req.files.map((file) => file.path); // Track uploaded file paths
 
   try {
-    // Upload each image to Cloudinary
-    for (const file of req.files) {
-      const result = await cloudinary.uploader.upload(file.path, {
+    ["image1", "image2", "image3", "image4"].forEach((field) => {
+      if (req.files[field]) {
+        images.push(req.files[field][0].path);
+      }
+    });
+
+    // Upload images to Cloudinary
+    const cloudImages = [];
+    for (const file of images) {
+      const result = await cloudinary.uploader.upload(file, {
         folder: "templates",
       });
-      images.push(result.secure_url);
+      cloudImages.push(result.secure_url);
     }
 
-    // Use the SKU sent from the frontend, or generate a new one if not provided
     const sku = hiddenSku || (await generateUniqueSku());
 
-    // Save the template to the database with Cloudinary URLs
     const template = new Template({
       designerId: req.user.id,
       description,
-      sku, // Use the provided SKU
-      images,
+      sku,
+      images: cloudImages,
       status: "pending",
     });
 
@@ -50,19 +59,65 @@ exports.uploadTemplate = async (req, res) => {
   } catch (error) {
     console.error("Error uploading template:", error);
     res.status(500).json({ message: "Template upload failed" });
-  } finally {
-    // Always remove uploaded files from the local server
-    uploadedFiles.forEach((filePath) => {
-      if (fs.existsSync(filePath)) {
-        try {
-          fs.unlinkSync(filePath);
-        } catch (err) {
-          console.error(`Failed to delete file: ${filePath}`, err);
-        }
-      }
-    });
   }
 };
+// exports.uploadTemplate = async (req, res) => {
+//   const { description, hiddenSku } = req.body;
+
+//   // Check if files were uploaded
+//   // if (!req.files || req.files.length === 0) {
+//   //   return res.status(400).json({ message: "No files were uploaded." });
+//   // }
+//   // Check for uploaded images
+//   ["image1", "image2", "image3", "image4"].forEach((field) => {
+//     if (req.files[field]) {
+//       images.push(req.files[field][0].path);
+//     }
+//   });
+//   const images = [];
+//   const uploadedFiles = req.files.map((file) => file.path); // Track uploaded file paths
+
+//   try {
+//     // Upload each image to Cloudinary
+//     for (const file of req.files) {
+//       const result = await cloudinary.uploader.upload(file.path, {
+//         folder: "templates",
+//       });
+//       images.push(result.secure_url);
+//     }
+
+//     // Use the SKU sent from the frontend, or generate a new one if not provided
+//     const sku = hiddenSku || (await generateUniqueSku());
+
+//     // Save the template to the database with Cloudinary URLs
+//     const template = new Template({
+//       designerId: req.user.id,
+//       description,
+//       sku, // Use the provided SKU
+//       images,
+//       status: "pending",
+//     });
+
+//     await template.save();
+//     res
+//       .status(201)
+//       .json({ message: "Template uploaded successfully", template });
+//   } catch (error) {
+//     console.error("Error uploading template:", error);
+//     res.status(500).json({ message: "Template upload failed" });
+//   } finally {
+//     // Always remove uploaded files from the local server
+//     uploadedFiles.forEach((filePath) => {
+//       if (fs.existsSync(filePath)) {
+//         try {
+//           fs.unlinkSync(filePath);
+//         } catch (err) {
+//           console.error(`Failed to delete file: ${filePath}`, err);
+//         }
+//       }
+//     });
+//   }
+// };
 
 // Get templates by designer
 exports.getDesignerTemplates = async (req, res) => {

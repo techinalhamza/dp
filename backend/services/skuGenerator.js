@@ -7,7 +7,6 @@ async function generateUniqueSku() {
   while (true) {
     const randomNumber = Math.floor(100 + Math.random() * 900);
     sku = `${prefix}${randomNumber}`;
-
     const existingTemplate = await Template.findOne({ sku });
     if (!existingTemplate) break;
   }

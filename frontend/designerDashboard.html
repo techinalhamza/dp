@@ -286,50 +286,39 @@
 
         <!-- Add New Template Section -->
         <!-- Add New Template Section -->
-        <div id="upload-section" class="section">
+        <div id="upload-section" class="section active">
           <h2>Add New Template</h2>
           <form id="templateForm">
-            <label for="description">Description:</label><br />
+            <label for="description">Description:</label>
             <input
               type="text"
               id="description"
               name="description"
-              required
             /><br /><br />
 
-            <label for="sku">SKU:</label><br />
-            <input
-              type="text"
-              id="sku"
-              name="sku"
-              readonly
-              style="display: none"
-            /><br />
-            <p id="skuPlaceholder">Generating SKU for your design...</p>
-            <input type="hidden" id="hiddenSku" name="hiddenSku" />
-            <br /><br />
-
-            <h3>Upload Images (4 maximum):</h3>
+            <h3>Upload Images (Max 4)</h3>
             <div class="image-upload-container">
               <div class="image-box">
-                <input type="file" id="image1" name="image1" accept="image/*" />
-                <img id="preview1" src="" alt="Image 1" />
+                <input type="file" id="image1" accept="image/*" />
+                <img id="preview1" src="" alt="" />
               </div>
               <div class="image-box">
-                <input type="file" id="image2" name="image2" accept="image/*" />
-                <img id="preview2" src="" alt="Image 2" />
+                <input type="file" id="image2" accept="image/*" />
+                <img id="preview2" src="" alt="" />
               </div>
               <div class="image-box">
-                <input type="file" id="image3" name="image3" accept="image/*" />
-                <img id="preview3" src="" alt="Image 3" />
+                <input type="file" id="image3" accept="image/*" />
+                <img id="preview3" src="" alt="" />
               </div>
               <div class="image-box">
-                <input type="file" id="image4" name="image4" accept="image/*" />
-                <img id="preview4" src="" alt="Image 4" />
+                <input type="file" id="image4" accept="image/*" />
+                <img id="preview4" src="" alt="" />
               </div>
             </div>
-            <br /><br />
 
+            <br />
+            <p id="skuPlaceholder">Generating SKU...</p>
+            <input type="hidden" id="hiddenSku" name="hiddenSku" />
             <button type="submit">Upload Template</button>
           </form>
         </div>
@@ -599,82 +588,106 @@
         loadDesignerStats();
 
         // Function to auto-generate SKU when navigating to the "Add New Template" section
-        const imageInputs = [1, 2, 3, 4].map((i) => document.getElementById(`image${i}`));
-        const imagePreviews = [1, 2, 3, 4].map((i) => document.getElementById(`preview${i}`));
+        // const imageInputs = [1, 2, 3, 4].map((i) =>
+        //   document.getElementById(`image${i}`)
+        // );
+        // const imagePreviews = [1, 2, 3, 4].map((i) =>
+        //   document.getElementById(`preview${i}`)
+        // );
         let skuGenerated = false;
         let currentSku = "";
 
+        // Image upload preview
+        const imageInputs = [1, 2, 3, 4].map((i) =>
+          document.getElementById(`image${i}`)
+        );
+        const imagePreviews = [1, 2, 3, 4].map((i) =>
+          document.getElementById(`preview${i}`)
+        );
+        imageInputs.forEach((input, index) => {
+          input.addEventListener("change", function () {
+            const file = input.files[0];
+            if (file) {
+              const reader = new FileReader();
+              reader.onload = function (e) {
+                imagePreviews[index].src = e.target.result;
+                imagePreviews[index].style.display = "block";
+                fetchSkuFromBackend();
+              };
+              reader.readAsDataURL(file);
+            }
+          });
+        });
         async function fetchSkuFromBackend() {
           if (skuGenerated) return;
 
-          try {
-            const token = localStorage.getItem("token");
-            const response = await fetch(
-              "http://localhost:3000/template/generate-sku",
-              {
-                method: "GET",
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            );
+          const description = document
+            .getElementById("description")
+            .value.trim();
+          const hasImages = imageInputs.some((input) => input.files.length > 0);
 
-            if (response.ok) {
-              const data = await response.json();
-              if (data.sku) {
-                currentSku = data.sku;
+          if (description || hasImages) {
+            try {
+              const response = await fetch(
+                "http://localhost:3000/template/generate-sku",
+                {
+                  method: "GET",
+                  headers: { Authorization: `Bearer ${token}` },
+                }
+              );
+
+              if (response.ok) {
+                const data = await response.json();
                 document.getElementById(
-                  "skuDisplay"
-                ).textContent = `SKU: ${currentSku}`;
-                document.getElementById("hiddenSku").value = currentSku;
+                  "skuPlaceholder"
+                ).textContent = `SKU: ${data.sku}`;
+                document.getElementById("hiddenSku").value = data.sku;
                 skuGenerated = true;
+              } else {
+                alert("Failed to generate SKU");
               }
-            } else {
-              console.error("Failed to fetch SKU:", response.statusText);
-              alert("Failed to generate SKU. Please try again.");
+            } catch (error) {
+              console.error("Error fetching SKU:", error);
             }
-          } catch (error) {
-            console.error("Error fetching SKU:", error);
-            alert("Error generating SKU. Please try again.");
           }
         }
 
         // Function to check user input
-        function checkForUserInput() {
-          const description = document
-            .getElementById("description")
-            .value.trim();
-          const images = document.getElementById("images").files;
+        // function checkForUserInput() {
+        //   const description = document
+        //     .getElementById("description")
+        //     .value.trim();
+        //   const images = document.querySelectorAll(".images").files;
 
-          // If any input is detected, fetch SKU
-          if ((description || images.length > 0) && !skuGenerated) {
-            fetchSkuFromBackend();
-          }
-        }
+        //   // If any input is detected, fetch SKU
+        //   if ((description || images.length > 0) && !skuGenerated) {
+        //     fetchSkuFromBackend();
+        //   }
+        // }
 
         // Event listeners to trigger SKU generation
-        document
-          .getElementById("description")
-          .addEventListener("input", checkForUserInput);
-        document
-          .getElementById("images")
-          .addEventListener("change", checkForUserInput);
+        // document
+        //   .getElementById("description")
+        //   .addEventListener("input", checkForUserInput());
+        // document
+        //   .querySelectorAll(".images")
+        //   .addEventListener("click", checkForUserInput());
 
-          // Handle image preview
-  imageInputs.forEach((input, index) => {
-    input.addEventListener("change", function () {
-      const file = input.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          imagePreviews[index].src = e.target.result;
-          imagePreviews[index].style.display = "block";
-        };
-        reader.readAsDataURL(file);
-        checkForUserInput();
-      }
-    });
-  });
+        // Handle image preview
+        // imageInputs.forEach((input, index) => {
+        //   input.addEventListener("change", function () {
+        //     const file = input.files[0];
+        //     if (file) {
+        //       const reader = new FileReader();
+        //       reader.onload = function (e) {
+        //         imagePreviews[index].src = e.target.result;
+        //         imagePreviews[index].style.display = "block";
+        //       };
+        //       reader.readAsDataURL(file);
+        //       checkForUserInput();
+        //     }
+        //   });
+        // });
 
         // Handle form submission for uploading a new template
         document
@@ -683,7 +696,7 @@
             event.preventDefault();
 
             const description = document.getElementById("description").value;
-            const imageFiles = document.getElementById("images").files;
+            // const imageFiles = document.getElementById("images").files;
             const hiddenSku = document.getElementById("hiddenSku").value;
 
             if (!hiddenSku) {
@@ -692,23 +705,24 @@
             }
 
             // Validate input
-            if (imageFiles.length === 0) {
-              alert("Please upload at least one image.");
-              return;
-            }
-            if (imageFiles.length > 4) {
-              alert("You can only upload up to 4 images.");
-              return;
-            }
+            // if (imageFiles.length === 0) {
+            //   alert("Please upload at least one image.");
+            //   return;
+            // }
+            // if (imageFiles.length > 4) {
+            //   alert("You can only upload up to 4 images.");
+            //   return;
+            // }
 
             const formData = new FormData();
             formData.append("description", description);
             formData.append("hiddenSku", hiddenSku); // Pass the SKU to the backend
 
-            // Append images to FormData
-            for (let i = 0; i < imageFiles.length; i++) {
-              formData.append("images", imageFiles[i]);
-            }
+            imageInputs.forEach((input, index) => {
+              if (input.files[0]) {
+                formData.append(`image${index + 1}`, input.files[0]);
+              }
+            });
 
             try {
               // Show the preloader
@@ -1145,7 +1159,5 @@
         }
       });
     </script>
-
-    
   </body>
 </html>

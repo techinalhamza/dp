@@ -28,26 +28,26 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage, limits: { files: 4 } });
 
 // Route for uploading a new template with images (using Cloudinary)
+// router.post(
+//   "/upload",
+//   authenticateToken,
+//   upload.array("images", 4),
+//   templateController.uploadTemplate // Use the uploadTemplate function directly
+// );
 router.post(
   "/upload",
   authenticateToken,
-  upload.array("images", 4),
-  templateController.uploadTemplate // Use the uploadTemplate function directly
+  upload.fields([
+    { name: "image1" },
+    { name: "image2" },
+    { name: "image3" },
+    { name: "image4" },
+  ]),
+  templateController.uploadTemplate
 );
 // Route to get a new SKU
-router.get("/generate-sku", authenticateToken, async (req, res) => {
-  try {
-    const sku = await generateUniqueSku();
-    if (sku) {
-      res.status(200).json({ sku });
-    } else {
-      res.status(500).json({ message: "Failed to generate SKU" });
-    }
-  } catch (error) {
-    console.error("Error generating SKU:", error);
-    res.status(500).json({ message: "Error generating SKU" });
-  }
-});
+router.get("/generate-sku", authenticateToken, templateController.generateSku);
+
 // Route for fetching all templates uploaded by the designer
 router.get("/", authenticateToken, templateController.getDesignerTemplates);
 
