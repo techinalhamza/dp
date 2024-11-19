@@ -16,7 +16,11 @@ const shopifyRoutes = require("./routes/shopifyRoutes");
 
 const app = express();
 const corsOptions = {
-  origin: ["http://127.0.0.1:5500", "https://charcuterietemplates.com"], // Replace with your frontend origin if different
+  origin: [
+    "http://127.0.0.1:5500",
+    "https://charcuterietemplates.com",
+    "https://techinalhamza.github.io",
+  ], // Replace with your frontend origin if different
   // origin: "http://127.0.0.1:5500", // Replace with your frontend origin if different
   credentials: true, // Allow credentials (cookies) to be sent
 };

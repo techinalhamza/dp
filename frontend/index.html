@@ -5,13 +5,141 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Designer Registration</title>
     <style>
-      .designer-register-container {
-        width: 80%;
-        margin: auto;
+      body {
+        font-family: "Poppins", sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
       }
 
+      .designer-register-container {
+        width: 40%;
+        /* background-color: #daa529; */
+        border-radius: 15px;
+        padding: 30px 40px 60px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.8);
+        margin: auto;
+      }
+      form#registerForm {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(48%, 1fr));
+        grid-column-gap: 10px;
+      }
+      .designer-register-container h1 {
+        text-align: center;
+        color: #daa520;
+        font-size: 2rem;
+        margin-bottom: 20px;
+        letter-spacing: 2px;
+      }
+
+      label {
+        display: block;
+        font-size: 1rem;
+        /* font-weight: bold; */
+        color: #000;
+        margin-bottom: 10px;
+      }
+
+      input,
+      select {
+        width: calc(100% - 35px);
+        padding: 12px 15px;
+        /* margin-bottom: 20px; */
+        border: 2px solid #f1f1f1;
+        border-radius: 8px;
+        font-size: 1rem;
+        background: #fff;
+        color: #000;
+        /* box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1); */
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      input:focus,
+      select:focus {
+        outline: none;
+        transform: scale(1.01);
+        box-shadow: 0 0 3px #daa520;
+      }
+
+      form#registerForm div:nth-child(3),
+      form#registerForm div:nth-child(6) {
+        grid-column: 1 / span 2;
+      }
+
+      form#registerForm button {
+        grid-column: 1 / span 2;
+      }
+
+      form#registerForm .payment-input {
+        grid-column: 1 / span 2;
+      }
+      button {
+        width: 100%;
+        padding: 15px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #000;
+        background-color: #fff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      button:hover {
+        background-color: #000;
+        color: #daa529;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+      }
+      .signup-link {
+        text-align: center;
+        grid-column: 1 / span 2;
+        margin: 1.5rem 0 0 0;
+        font-size: 12px;
+      }
+      .signup-link a {
+        color: #daa520;
+        text-decoration: none;
+        font-weight: bold;
+      }
       .conditional-field {
         display: none;
+      }
+
+      .conditional-field input {
+        background: #fff;
+      }
+
+      .conditional-field label {
+        color: #000;
+      }
+      select#payment_method {
+        width: 100%;
+      }
+      @media (max-width: 768px) {
+        .designer-register-container {
+          width: 90%;
+          padding: 20px;
+        }
+
+        .designer-register-container h1 {
+          font-size: 2.2rem;
+        }
+
+        input,
+        select {
+          font-size: 0.9rem;
+        }
+
+        button {
+          font-size: 1rem;
+        }
       }
     </style>
   </head>
@@ -20,61 +148,82 @@
     <div class="designer-register-container">
       <h1>Designer Registration</h1>
       <form id="registerForm">
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required /><br /><br />
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required /><br /><br />
-        <label for="password">Password:</label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          required
-        /><br /><br />
-        <label for="social">Last 4 of Social Security:</label>
-        <input
-          type="text"
-          id="social"
-          name="social"
-          maxlength="4"
-          required
-        /><br /><br />
-        <label for="phone">Phone Number:</label>
-        <input type="tel" id="phone" name="phone" required /><br /><br />
-        <label for="payment_method">Preferred Payment Method:</label>
-        <select id="payment_method" name="payment_method" required>
-          <option value="">Select a Payment Method</option>
-          <option value="paypal">PayPal</option>
-          <option value="venmo">Venmo</option>
-          <option value="cashapp">Cash App</option></select
-        ><br /><br />
-        <div id="paypal_email" class="conditional-field">
-          <label for="paypal_email_input">PayPal Email:</label>
+        <div>
+          <label for="name">Name:</label>
+          <input type="text" id="name" name="name" required /><br /><br />
+        </div>
+        <div>
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" required /><br /><br />
+        </div>
+        <div>
+          <label for="password">Password:</label>
           <input
-            type="email"
-            id="paypal_email_input"
-            name="paypal_email"
+            type="password"
+            id="password"
+            name="password"
+            required
           /><br /><br />
         </div>
-        <div id="venmo_username" class="conditional-field">
-          <label for="venmo_username_input">Venmo Username:</label>
+        <div>
+          <label for="social">Last 4 of Social Security:</label>
           <input
             type="text"
-            id="venmo_username_input"
-            name="venmo_username"
+            id="social"
+            name="social"
+            maxlength="4"
+            required
           /><br /><br />
         </div>
-        <div id="cashapp_username" class="conditional-field">
-          <label for="cashapp_username_input"
-            >Cash App Username ($Cashtag):</label
-          >
-          <input
-            type="text"
-            id="cashapp_username_input"
-            name="cashapp_username"
-          /><br /><br />
+        <div>
+          <label for="phone">Phone Number:</label>
+          <input type="tel" id="phone" name="phone" required /><br /><br />
+        </div>
+        <div>
+          <label for="payment_method">Preferred Payment Method:</label>
+          <select id="payment_method" name="payment_method" required>
+            <option value="">Select a Payment Method</option>
+            <option value="paypal">PayPal</option>
+            <option value="venmo">Venmo</option>
+            <option value="cashapp">Cash App</option></select
+          ><br /><br />
+        </div>
+        <div class="payment-input">
+          <div id="paypal_email" class="conditional-field">
+            <label for="paypal_email_input">PayPal Email:</label>
+            <input
+              type="email"
+              id="paypal_email_input"
+              name="paypal_email"
+            /><br /><br />
+          </div>
+          <div id="venmo_username" class="conditional-field">
+            <label for="venmo_username_input">Venmo Username:</label>
+            <input
+              type="text"
+              id="venmo_username_input"
+              name="venmo_username"
+            /><br /><br />
+          </div>
+          <div id="cashapp_username" class="conditional-field">
+            <label for="cashapp_username_input"
+              >Cash App Username ($Cashtag):</label
+            >
+            <input
+              type="text"
+              id="cashapp_username_input"
+              name="cashapp_username"
+            /><br /><br />
+          </div>
         </div>
         <button type="submit">Register</button>
+        <!-- <p style="text-align: center" class="signup-link"> -->
+        <span class="signup-link"
+          >Already have an account<a href="/frontend/login.html">
+            Login</a
+          ></span
+        >
+        <!-- </p> -->
       </form>
     </div>
 

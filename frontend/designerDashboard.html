@@ -210,6 +210,297 @@
           transform: rotate(360deg);
         }
       }
+
+      /* ----------------------------------------------------------------------------------- */
+      /* ----------------------------------------------------------------------------------- */
+      /* ----------------------------------------------------------------------------------- */
+      /* ----------------------------------------------------------------------------------- */
+
+      .section {
+        /* background: #1c1 c1c; */
+        padding: 40px;
+        border-radius: 15px;
+        /* width: 50%;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7); */
+      }
+      div#upload-section {
+        margin: auto;
+        width: 50%;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+      }
+
+      .section h2 {
+        color: #daa529;
+        font-size: 2rem;
+        text-align: center;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+      }
+
+      label {
+        display: block;
+        font-size: 1rem;
+        margin-bottom: 10px;
+        /* color: #ff f; */
+      }
+
+      input[type="text"],
+      input[type="file"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+        border: none;
+        border-radius: 5px;
+        /* background: #  2c2c2c; */
+        color: #fff;
+        font-size: 1rem;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: border 0.3s ease, background-color 0.3s ease;
+      }
+
+      input[type="text"]:focus,
+      input[type="file"]:focus {
+        border: 2px solid #daa529;
+        /* background-color: #3 33; */
+        outline: none;
+      }
+
+      .image-upload-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .image-box {
+        position: relative;
+        /* background:  #2c2c2c; */
+        border-radius: 8px;
+        text-align: center;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        transition: transform 0.3s ease;
+      }
+
+      .image-box:hover {
+        transform: scale(1.05);
+      }
+
+      .image-box input {
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+      }
+
+      .image-box img {
+        max-width: 100%;
+        max-height: 100%;
+        display: none;
+        margin-top: 10px;
+      }
+
+      button {
+        width: 100%;
+        padding: 15px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #fff;
+        background-color: #daa529;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(218, 165, 41, 0.5);
+      }
+
+      #skuPlaceholder {
+        /* text-align:  center; */
+        color: #000;
+        font-size: 0.9rem;
+        /* margin-top: -10px; */
+      }
+
+      @media (max-width: 768px) {
+        .section {
+          width: 90%;
+          padding: 20px;
+        }
+
+        .image-upload-container {
+          grid-template-columns: 1fr;
+        }
+      }
+      /* ---------------------------------------------------------- */
+      /* ---------------------------------------------------------- */
+      /* ---------------------------------------------------------- */
+
+      select,
+      input {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 20px;
+        border: none;
+        border-radius: 5px;
+        color: #000;
+        font-size: 1rem;
+        transition: border 0.3s ease, background-color 0.3s ease;
+      }
+      div#payment-section {
+        width: 30%;
+        margin: auto;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+      }
+
+      select:focus,
+      input:focus {
+        border: 2px solid #daa529;
+        outline: none;
+      }
+
+      .conditional-field {
+        display: none;
+      }
+
+      button {
+        width: 100%;
+        padding: 15px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #fff;
+        background-color: #daa529;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(218, 165, 41, 0.5);
+      }
+
+      @media (max-width: 768px) {
+        .section {
+          width: 90%;
+          padding: 20px;
+        }
+
+        h2 {
+          font-size: 1.8rem;
+        }
+
+        button {
+          font-size: 1rem;
+        }
+      }
+
+      /* ----------------------------------------------------------------- */
+      /* ----------------------------------------------------------------- */
+      /* ----------------------------------------------------------------- */
+      /* ----------------------------------------------------------------- */
+
+      #templateModal {
+        display: none; /* Hidden by default */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        /* background-colo  r: rgba(0, 0, 0, 0.8); */
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-content {
+        /* background-color: #1c1c1c; */
+        width: 90%;
+        max-width: 600px;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        position: relative;
+        color: #000;
+      }
+
+      #closeModal {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background-color: #daa520;
+        border-radius: 50px;
+        color: #fff;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: color 0.3s ease;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #closeModal:hover {
+        color: #fff;
+      }
+      .modal-content-details {
+        text-align: left;
+      }
+      .modal-content h3 {
+        color: #daa529;
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+        text-align: center;
+      }
+
+      .modal-content p {
+        margin: 10px 0;
+        font-size: 1rem;
+      }
+
+      #largeImage {
+        margin: 20px 0;
+        border-radius: 5px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+      }
+
+      .thumbnail-container {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 15px;
+      }
+
+      .thumbnail-container img {
+        width: 80px;
+        height: 80px;
+        border-radius: 5px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: transform 0.3s ease, border-color 0.3s ease;
+      }
+
+      .thumbnail-container img:hover {
+        transform: scale(1.1);
+        border-color: #daa529;
+      }
+
+      #modalSalesCount,
+      #modalEarnings {
+        font-size: 1rem;
+        /* font-style: italic; */
+        color: #000;
+      }
     </style>
   </head>
   <body>
@@ -220,7 +511,7 @@
         <ul>
           <li class="sidebar-item" data-section="welcome-section">Welcome</li>
           <li class="sidebar-item" data-section="upload-section">
-            Add New Template
+            Add New Design
           </li>
           <li class="sidebar-item" data-section="templates-section">
             Uploaded Templates
@@ -259,7 +550,7 @@
         <div id="welcome-section" class="section active">
           <h2 id="designerName">Welcome, Designer!</h2>
           <p>
-            Manage your templates, track sales, and update your payment
+            Manage your Designs, track sales, and update your payment
             information.
           </p>
 
@@ -286,8 +577,8 @@
 
         <!-- Add New Template Section -->
         <!-- Add New Template Section -->
-        <div id="upload-section" class="section active">
-          <h2>Add New Template</h2>
+        <div id="upload-section" class="section">
+          <h2>Add New Design</h2>
           <form id="templateForm">
             <label for="description">Description:</label>
             <input
@@ -317,7 +608,12 @@
             </div>
 
             <br />
-            <p id="skuPlaceholder">Generating SKU...</p>
+            <div
+              style="display: flex; align-items: center; justify-content: centr"
+            >
+              <b>SKU:&nbsp;</b>
+              <p id="skuPlaceholder">Generating SKU...</p>
+            </div>
             <input type="hidden" id="hiddenSku" name="hiddenSku" />
             <button type="submit">Upload Template</button>
           </form>
@@ -415,14 +711,7 @@
     <!-- Modal for Viewing Template Details -->
     <div id="templateModal">
       <div class="modal-content">
-        <button id="closeModal">Close</button>
-        <h3 id="modalDescription"></h3>
-        <p><strong>SKU:</strong> <span id="modalSKU"></span></p>
-        <p><strong>UPC:</strong> <span id="modalUPC"></span></p>
-        <p>Status: <span id="modalStatus"></span></p>
-        <p id="modalSalesCount" style="display: none"></p>
-        <p id="modalEarnings" style="display: none"></p>
-        <p id="modalUploadTime"></p>
+        <span id="closeModal">Close</span>
         <img
           id="largeImage"
           src=""
@@ -430,6 +719,15 @@
           style="width: 100%; height: auto"
         />
         <div id="imageThumbnails" class="thumbnail-container"></div>
+        <div class="modal-content-details">
+          <p><b>Description: </b> <span id="modalDescription"></span></p>
+          <p><strong>SKU:</strong> <span id="modalSKU"></span></p>
+          <p><strong>UPC:</strong> <span id="modalUPC"></span></p>
+          <p><strong>Status</strong> <span id="modalStatus"></span></p>
+          <p id="modalSalesCount" style="display: none"></p>
+          <p id="modalEarnings" style="display: none"></p>
+          <p id="modalUploadTime"></p>
+        </div>
       </div>
     </div>
 
@@ -640,7 +938,8 @@
                 const data = await response.json();
                 document.getElementById(
                   "skuPlaceholder"
-                ).textContent = `SKU: ${data.sku}`;
+                ).textContent = ` ${data.sku}`;
+                console.log(data.sku);
                 document.getElementById("hiddenSku").value = data.sku;
                 skuGenerated = true;
               } else {
@@ -830,12 +1129,10 @@
 
           document.getElementById("modalDescription").textContent =
             template.description;
-          document.getElementById(
-            "modalSKU"
-          ).textContent = `SKU: ${template.sku}`;
+          document.getElementById("modalSKU").textContent = ` ${template.sku}`;
           document.getElementById(
             "modalStatus"
-          ).textContent = `Status: ${template.status}`;
+          ).textContent = ` ${template.status}`;
           document.getElementById("modalUPC").textContent = `UPC: ${
             template.upc || "Admin will assign"
           }`;
@@ -850,9 +1147,11 @@
           const earningsElement = document.getElementById("modalEarnings");
 
           if (template.status.toLowerCase() === "approved") {
-            earningsElement.textContent = `Earnings: $${earnings.toFixed(2)}`;
+            earningsElement.innerHTML = `<strong>Earnings:</strong> $${earnings.toFixed(
+              2
+            )}`;
             earningsElement.style.display = "block";
-            modalSalesCount.textContent = `Sales Count: ${
+            modalSalesCount.innerHTML = `<strong>Sales Count: </strong> ${
               template.sales_count || 0
             }`;
             modalSalesCount.style.display = "block";

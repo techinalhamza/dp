@@ -1,7 +1,7 @@
 const { Template } = require("../models");
 
 async function generateUniqueSku() {
-  const prefix = "RNZ";
+  const prefix = "RNZ ";
   let sku;
 
   while (true) {
