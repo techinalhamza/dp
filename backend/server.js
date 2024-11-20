@@ -18,6 +18,7 @@ const app = express();
 const corsOptions = {
   origin: [
     "http://127.0.0.1:5500",
+    "http://127.0.0.1:5501",
     "https://charcuterietemplates.com",
     "https://techinalhamza.github.io",
   ], // Replace with your frontend origin if different
