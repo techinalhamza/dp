@@ -21,7 +21,11 @@ router.get(
   authenticateToken,
   designerController.getSalesChartData
 );
-
+router.get(
+  "/payment-info",
+  authenticateToken,
+  designerController.getPaymentInfo
+);
 // Route for updating payment information
 router.put(
   "/update-payment-info",

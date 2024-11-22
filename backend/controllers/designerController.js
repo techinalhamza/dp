@@ -23,31 +23,80 @@ exports.getProfile = async (req, res) => {
       .json({ message: "Failed to fetch profile. Please try again." });
   }
 };
-
-// Update payment information
-exports.updatePaymentInfo = async (req, res) => {
-  const { payment_method, paypal_email, venmo_username, cashapp_username } =
-    req.body;
-
+exports.getPaymentInfo = async (req, res) => {
   try {
-    const updatedDesigner = await Designer.findByIdAndUpdate(
-      req.user.id,
-      {
-        payment_method,
-        payment_details: { paypal_email, venmo_username, cashapp_username },
-      },
-      { new: true }
-    );
-
-    res.json({
-      message: "Payment information updated successfully.",
-      updatedDesigner,
-    });
+    const designer = await Designer.findById(req.user.id).select("paymentInfo");
+    if (!designer) {
+      return res.status(404).json({ message: "Designer not found" });
+    }
+    res.json(designer.paymentInfo);
   } catch (error) {
-    console.error("Error updating payment information:", error);
-    res.status(500).json({ message: "Error updating payment information." });
+    console.error("Error fetching payment info:", error);
+    res.status(500).json({ message: "Failed to fetch payment info" });
   }
 };
+// Update payment information
+// Update or add payment details
+exports.updatePaymentInfo = async (req, res) => {
+  try {
+    const { payment_method, paypal_email, venmo_username, cashapp_username } =
+      req.body;
+
+    const designer = await Designer.findById(req.user.id);
+    if (!designer) {
+      return res.status(404).json({ message: "Designer not found" });
+    }
+
+    if (!designer.paymentInfo) {
+      designer.paymentInfo = {};
+    }
+
+    // Update payment details
+    switch (payment_method) {
+      case "paypal":
+        designer.paymentInfo.paypal_email = paypal_email || null;
+        break;
+      case "venmo":
+        designer.paymentInfo.venmo_username = venmo_username || null;
+        break;
+      case "cashapp":
+        designer.paymentInfo.cashapp_username = cashapp_username || null;
+        break;
+      default:
+        return res.status(400).json({ message: "Invalid payment method" });
+    }
+
+    await designer.save();
+
+    res.json({ message: "Payment information updated successfully" });
+  } catch (error) {
+    console.error("Error updating payment info:", error);
+    res.status(500).json({ message: "Failed to update payment info" });
+  }
+};
+// exports.updatePaymentInfo = async (req, res) => {
+//   const { payment_method, paypal_email, venmo_username, cashapp_username } =
+//     req.body;
+
+//   try {
+//     const updatedDesigner = await Designer.findByIdAndUpdate(
+//       req.user.id,
+//       {
+//         payment_method,
+//         payment_details: { paypal_email, venmo_username, cashapp_username },
+//       },
+//       { new: true }
+//     );
+
+//     res.json({
+//       message: "Payment information updated successfully.",
+//       updatedDesigner,
+//     });
+//   } catch (error) {
+//     console.error("Error updating payment information:", error);
+//     res.status(500).json({ message: "Error updating payment information." });
+//   }
+// };
 
 // Get statistics for the designer
 // exports.getStats = async (req, res) => {
