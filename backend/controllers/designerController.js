@@ -10,11 +10,11 @@ exports.getProfile = async (req, res) => {
       return res.status(404).json({ message: "Designer not found" });
     }
     res.json({
-      name: designer.name,
-      email: designer.email,
-      phone: designer.phone,
-      payment_method: designer.payment_method,
-      payment_details: designer.payment_details,
+      name: designer.name || "N/A",
+      email: designer.email || "N/A",
+      phone: designer.phone || "N/A",
+      payment_method: designer.payment_method || "N/A",
+      payment_details: designer.payment_details || {},
     });
   } catch (error) {
     console.error("Error fetching designer profile:", error);
@@ -29,7 +29,10 @@ exports.getPaymentInfo = async (req, res) => {
     if (!designer) {
       return res.status(404).json({ message: "Designer not found" });
     }
-    res.json(designer.paymentInfo);
+
+    // Ensure paymentInfo is not null/undefined
+    const paymentInfo = designer.paymentInfo || {};
+    res.json(paymentInfo);
   } catch (error) {
     console.error("Error fetching payment info:", error);
     res.status(500).json({ message: "Failed to fetch payment info" });

@@ -9,9 +9,9 @@ const designerSchema = new mongoose.Schema({
   phone: String,
   payment_method: String,
   payment_details: {
-    paypal_email: String,
-    venmo_username: String,
-    cashapp_username: String,
+    paypal_email: { type: String, default: null },
+    venmo_username: { type: String, default: null },
+    cashapp_username: { type: String, default: null },
   },
 });
 

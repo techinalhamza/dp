@@ -7,13 +7,6 @@ const authenticateToken = require("../middleware/authMiddleware");
 // Route to get designer profile (requires authentication)
 router.get("/profile", authenticateToken, designerController.getProfile);
 
-// Route for updating payment information
-router.put(
-  "/update-payment-info",
-  authenticateToken,
-  designerController.updatePaymentInfo
-);
-
 // Route to get designer stats for dashboard
 router.get("/stats", authenticateToken, designerController.getStats);
 router.get(
